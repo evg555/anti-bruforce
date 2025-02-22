@@ -1,0 +1,67 @@
+on:
+  push:
+    branches:
+      - project_*
+
+env:
+  GO111MODULE: "on"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract branch name
+        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ~1.23
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Linters
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.64.5
+          working-directory: ${{ env.BRANCH }}
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract branch name
+        run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ^1.23
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Unit tests
+        run: go test -v -count=100 -race -timeout=1m ./...
+        working-directory: ${{ env.BRANCH }}
+
+  tests_by_makefile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ^1.23
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: make lint
+        run: make lint
+
+      - name: make build
+        run: make build
+
+      - name: make test
+        run: make test
+
