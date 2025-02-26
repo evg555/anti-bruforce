@@ -1,6 +1,21 @@
 version: "3"
 
 services:
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    ports:
+      - ${GRPC_PORT}:${GRPC_PORT}
+    volumes:
+      - ../configs/app.toml:/configs/app.toml
+    command: [ "./api_server", "--config=configs/app.toml" ]
+    depends_on:
+      - db
+    networks:
+      antibrutforce:
+        aliases:
+          - app
 #  migrate:
 #    build:
 #      context: ..
