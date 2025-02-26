@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package app;
+
+option go_package = "./;pb";
+
+service AppService {
+  rpc Auth(AuthRequest) returns (Response) {
+  }
+  rpc BucketReset(BucketResetRequest) returns (Response) {
+  }
+  rpc AddIpWhitelist(IpRequest) returns (Response) {
+  }
+  rpc DeleteIpWhitelist(IpRequest) returns (Response) {
+  }
+  rpc AddIpBlacklist(IpRequest) returns (Response) {
+  }
+  rpc DeleteIpBlacklist(IpRequest) returns (Response) {
+  }
+}
+
+message AuthRequest {
+  string login = 1;
+  string password = 2;
+  string ip = 3;
+}
+
+message BucketResetRequest {
+  string password = 2;
+  string ip = 3;
+}
+
+message IpRequest {
+  string net_address = 1;
+}
+
+message Response {
+  bool ok = 1;
+}
+
+

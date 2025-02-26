@@ -3,6 +3,8 @@ package internalgrpc
 import (
 	"context"
 	"fmt"
+	"github.com/evg555/antibrutforce/api/pb"
+	"google.golang.org/grpc/reflection"
 	"net"
 
 	"github.com/evg555/antibrutforce/internal/config"
@@ -38,24 +40,24 @@ func (s *Server) Start(ctx context.Context) error {
 		grpc.ChainUnaryInterceptor(s.loggingMiddleware),
 	)
 
-	//reflection.Register(s.srv)
-	//pb.RegisterEventServiceServer(s.srv, Handler{
-	//	app:    s.app,
-	//	logger: s.logger,
-	//})
+	reflection.Register(s.srv)
+	pb.RegisterAppServiceServer(s.srv, Handler{
+		app:    s.app,
+		logger: s.logger,
+	})
 
 	addr := net.JoinHostPort(s.cfg.App.Host, s.cfg.App.Port)
 
-	//listener, err := net.Listen("tcp", addr)
-	//if err != nil {
-	//	return err
-	//}
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
 
 	s.logger.Info(fmt.Sprintf("grpc server starting at %s", addr))
 
-	//if err = s.srv.Serve(listener); err != nil {
-	//	return err
-	//}
+	if err = s.srv.Serve(listener); err != nil {
+		return err
+	}
 
 	<-ctx.Done()
 	return nil
