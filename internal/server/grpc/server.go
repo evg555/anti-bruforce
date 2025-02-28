@@ -30,6 +30,10 @@ type Application interface {
 	DeleteIpWhitelist(ctx context.Context, subnet string) error
 	AddIpBlacklist(ctx context.Context, subnet string) error
 	DeleteIpBlacklist(ctx context.Context, subnet string) error
+
+	IsInBlacklist(ctx context.Context, ip string) bool
+	IsInWhitelist(ctx context.Context, ip string) bool
+	HasLimits(ctx context.Context, login, password, ip string) bool
 }
 
 func NewServer(cfg config.Config, logger Logger, app Application) *Server {

@@ -72,22 +72,75 @@ func (a *APITestSuite) TearDownSuite() {
 }
 
 func (a *APITestSuite) TestAuth() {
-	req := &pb.AuthRequest{
-		Login:    "login",
-		Password: "pass",
-		Ip:       "172.1.1.1",
+	netAddress := "172.1.1.0/24"
+	ipAddress := "172.1.1.1"
+	login := "login"
+	password := "password"
+
+	authReq := &pb.AuthRequest{}
+	res, err := a.client.Auth(context.Background(), authReq)
+	a.Error(err)
+
+	st, ok := status.FromError(err)
+	a.True(ok)
+	a.Equal(codes.InvalidArgument, st.Code())
+
+	// In blacklist
+	req := &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.AddIpBlacklist(context.Background(), req)
+	a.NoError(err)
+
+	authReq = &pb.AuthRequest{
+		Login:    login,
+		Password: password,
+		Ip:       ipAddress,
 	}
-	res, err := a.client.Auth(context.Background(), req)
+	res, err = a.client.Auth(context.Background(), authReq)
+	a.NoError(err)
+	a.NotNil(res)
+	a.False(res.Ok)
+
+	req = &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.DeleteIpBlacklist(context.Background(), req)
+	a.NoError(err)
+
+	// In whitelist (priority)
+	req = &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.AddIpBlacklist(context.Background(), req)
+	a.NoError(err)
+
+	req = &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.AddIpWhitelist(context.Background(), req)
+	a.NoError(err)
+
+	authReq = &pb.AuthRequest{
+		Login:    login,
+		Password: password,
+		Ip:       ipAddress,
+	}
+	res, err = a.client.Auth(context.Background(), authReq)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
 
-	// Проверяем, что данные сохранились в БД
-	//var user User
-	//err = db.First(&user, res.Id).Error
-	//assert.NoError(t, err)
-	//assert.Equal(t, "John Doe", user.Name)
-	//assert.Equal(t, 30, user.Age)
+	req = &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.DeleteIpBlacklist(context.Background(), req)
+	a.NoError(err)
+
+	req = &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.DeleteIpWhitelist(context.Background(), req)
+	a.NoError(err)
+
+	// Limits for password are ended
+	authReq = &pb.AuthRequest{
+		Login:    login,
+		Password: password,
+		Ip:       ipAddress,
+	}
+	res, err = a.client.Auth(context.Background(), authReq)
+	a.NoError(err)
+	a.NotNil(res)
+	a.False(res.Ok)
 }
 
 func (a *APITestSuite) TestBucketReset() {

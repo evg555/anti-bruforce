@@ -27,3 +27,26 @@ func TestIsValidSubnet(t *testing.T) {
 		})
 	}
 }
+
+func TestIsValidIpAddress(t *testing.T) {
+	type testCase struct {
+		input    string
+		expected bool
+	}
+
+	testCases := []testCase{
+		{"172.0.0.1", true},
+		{"192.168.1.0", true},
+		{"10.0.0.2", true},
+		{"0.0.0.0", true},
+		{"255.255.255.255", true},
+		{"256.0.0.1", false}, // Неверный IP (256 недопустимо)
+		{"not_a_ip", false},  // Некорректный ввод
+	}
+
+	for _, tc := range testCases {
+		t.Run("test ip: "+tc.input, func(t *testing.T) {
+			assert.Equal(t, tc.expected, IsValidIpAddress(tc.input))
+		})
+	}
+}

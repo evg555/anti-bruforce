@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/evg555/antibrutforce/internal/storage"
 )
@@ -24,6 +25,7 @@ type Storage interface {
 	Save(ctx context.Context, subnet storage.Subnet, listType string) error
 	Find(ctx context.Context, address, listType string) (*storage.Subnet, error)
 	Delete(ctx context.Context, address, listType string) error
+	IsInList(ctx context.Context, address, listType string) (bool, error)
 }
 
 func New(logger Logger, storage Storage) *App {
@@ -31,6 +33,30 @@ func New(logger Logger, storage Storage) *App {
 		logger:  logger,
 		storage: storage,
 	}
+}
+
+func (a *App) IsInBlacklist(ctx context.Context, ip string) bool {
+	isInList, err := a.storage.IsInList(ctx, ip, storage.Blacklist)
+	if err != nil {
+		a.logger.Error(fmt.Sprintf("storage error: %s", err))
+		return false
+	}
+
+	return isInList
+}
+
+func (a *App) IsInWhitelist(ctx context.Context, ip string) bool {
+	isInList, err := a.storage.IsInList(ctx, ip, storage.Whitelist)
+	if err != nil {
+		a.logger.Error(fmt.Sprintf("storage error: %s", err))
+		return false
+	}
+
+	return isInList
+}
+
+func (a *App) HasLimits(ctx context.Context, login, password, ip string) bool {
+	return false
 }
 
 func (a *App) AddIpWhitelist(ctx context.Context, subnet string) error {

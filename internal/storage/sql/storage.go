@@ -2,6 +2,8 @@ package sqlstorage
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/evg555/antibrutforce/internal/storage"
@@ -78,4 +80,22 @@ func (s *Storage) Delete(ctx context.Context, address, listType string) error {
 	}
 
 	return nil
+}
+
+func (s *Storage) IsInList(ctx context.Context, address, listType string) (bool, error) {
+	var res int
+
+	query := fmt.Sprintf("SELECT 1 FROM %s WHERE $1::inet << subnet", listType)
+
+	row := s.db.QueryRowxContext(ctx, query, address)
+
+	err := row.Scan(&res)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, fmt.Errorf("failed to check ip %s in %s: %w", address, listType, err)
+	}
+
+	return res == 1, nil
 }

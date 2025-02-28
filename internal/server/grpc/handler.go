@@ -18,6 +18,20 @@ type Handler struct {
 }
 
 func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Response, error) {
+	ipAddress := request.Ip
+
+	if !common.IsValidIpAddress(ipAddress) {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid ip address")
+	}
+
+	if h.app.IsInWhitelist(ctx, ipAddress) {
+		return &pb.Response{Ok: true}, nil
+	}
+
+	if h.app.IsInBlacklist(ctx, ipAddress) || !h.app.HasLimits(ctx, request.Login, request.Password, request.Ip) {
+		return &pb.Response{Ok: false}, nil
+	}
+
 	return &pb.Response{Ok: true}, nil
 }
 
