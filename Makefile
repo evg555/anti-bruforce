@@ -3,6 +3,14 @@ APP := "./bin/app"
 GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
 
+GOOSE=goose
+MIGRATIONS_DIR=migrations
+
+ifneq (,$(wildcard ./deployments/.env))
+    include ./deployments/.env
+    export $(shell sed 's/=.*//' ./deployments/.env)
+endif
+
 build:
 	go build -v -o $(APP) -ldflags "$(LDFLAGS)" ./cmd/main.go
 
@@ -31,4 +39,11 @@ install-protoc-deps:
 generate: install-protoc-deps
 	go generate ./...
 
-.PHONY: build test lint up down generate test_integrate
+migrate-up:
+	$(GOOSE) -dir $(MIGRATIONS_DIR) postgres "postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable" up
+
+migrate-down:
+	$(GOOSE) -dir $(MIGRATIONS_DIR) postgres "postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable" down
+
+
+.PHONY: build test lint up down generate test_integrate migrate-up migrate-down
