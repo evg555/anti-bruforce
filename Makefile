@@ -7,7 +7,10 @@ build:
 	go build -v -o $(APP) -ldflags "$(LDFLAGS)" ./cmd/main.go
 
 test:
-	go test -race ./...
+	go test -race -count=100 ./internal/...
+
+test_integrate: up
+	go test -v -count=1 ./tests/...
 
 install-lint-deps:
 	(which golangci-lint > /dev/null) || curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin v1.64.5
@@ -28,4 +31,4 @@ install-protoc-deps:
 generate: install-protoc-deps
 	go generate ./...
 
-.PHONY: build test lint up down generate
+.PHONY: build test lint up down generate test_integrate
