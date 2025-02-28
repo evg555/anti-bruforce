@@ -3,14 +3,17 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/evg555/antibrutforce/api/pb"
-	"github.com/stretchr/testify/suite"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"testing"
 
+	"github.com/evg555/antibrutforce/api/pb"
+	"github.com/evg555/antibrutforce/internal/storage"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/suite"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 type APITestSuite struct {
@@ -27,6 +30,10 @@ func TestApiTestSuite(t *testing.T) {
 func (a *APITestSuite) SetupSuite() {
 	a.setupDB()
 	a.setupGRPSClient()
+}
+
+func (a *APITestSuite) SetupTest() {
+	a.truncateTables()
 }
 
 func (a *APITestSuite) setupDB() {
@@ -48,7 +55,15 @@ func (a *APITestSuite) setupGRPSClient() {
 	a.client = pb.NewAppServiceClient(conn)
 }
 
+func (a *APITestSuite) truncateTables() {
+	query := `TRUNCATE TABLE whitelist; TRUNCATE TABLE blacklist;`
+	_, err := a.db.Exec(query)
+	a.Require().NoError(err)
+}
+
 func (a *APITestSuite) TearDownSuite() {
+	a.truncateTables()
+
 	err := a.db.Close()
 	a.Require().NoError(err)
 
@@ -96,45 +111,71 @@ func (a *APITestSuite) TestBucketReset() {
 func (a *APITestSuite) TestIpWhitelist() {
 	netAddress := "172.1.1.0/24"
 
-	req := &pb.IpRequest{NetAddress: netAddress}
+	// Invalid subnet
+	req := &pb.IpRequest{}
 	res, err := a.client.AddIpWhitelist(context.Background(), req)
+	a.Error(err)
+
+	st, ok := status.FromError(err)
+	a.True(ok)
+	a.Equal(codes.InvalidArgument, st.Code())
+
+	// Positive case
+	req = &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.AddIpWhitelist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
 
-	// Проверяем, что данные сохранились в БД
-	//var user User
-	//err = db.First(&user, res.Id).Error
-	//assert.NoError(t, err)
-	//assert.Equal(t, "John Doe", user.Name)
-	//assert.Equal(t, 30, user.Age)
+	var rows1 []storage.Subnet
+	err = a.db.Select(&rows1, `SELECT * FROM whitelist WHERE subnet=$1 LIMIT 1`, netAddress)
+	a.NoError(err)
+	a.Equal(rows1[0].Address, netAddress)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
 	res, err = a.client.DeleteIpWhitelist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
+
+	var rows2 []storage.Subnet
+	err = a.db.Select(&rows2, `SELECT * FROM whitelist WHERE subnet=$1 LIMIT 1`, netAddress)
+	a.NoError(err)
+	a.Empty(rows2)
 }
 
 func (a *APITestSuite) TestIpBlackList() {
 	netAddress := "172.1.1.0/24"
 
-	req := &pb.IpRequest{NetAddress: netAddress}
+	// Invalid subnet
+	req := &pb.IpRequest{}
 	res, err := a.client.AddIpBlacklist(context.Background(), req)
+	a.Error(err)
+
+	st, ok := status.FromError(err)
+	a.True(ok)
+	a.Equal(codes.InvalidArgument, st.Code())
+
+	// Positive case
+	req = &pb.IpRequest{NetAddress: netAddress}
+	res, err = a.client.AddIpBlacklist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
 
-	// Проверяем, что данные сохранились в БД
-	//var user User
-	//err = db.First(&user, res.Id).Error
-	//assert.NoError(t, err)
-	//assert.Equal(t, "John Doe", user.Name)
-	//assert.Equal(t, 30, user.Age)
+	var rows1 []storage.Subnet
+	err = a.db.Select(&rows1, `SELECT * FROM blacklist WHERE subnet=$1 LIMIT 1`, netAddress)
+	a.NoError(err)
+	a.Equal(rows1[0].Address, netAddress)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
 	res, err = a.client.DeleteIpBlacklist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
+
+	var rows2 []storage.Subnet
+	err = a.db.Select(&rows2, `SELECT * FROM blacklist WHERE subnet=$1 LIMIT 1`, netAddress)
+	a.NoError(err)
+	a.Empty(rows2)
 }

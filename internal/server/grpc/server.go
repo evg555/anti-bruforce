@@ -25,7 +25,12 @@ type Logger interface {
 	Debug(msg string)
 }
 
-type Application interface{}
+type Application interface {
+	AddIpWhitelist(ctx context.Context, subnet string) error
+	DeleteIpWhitelist(ctx context.Context, subnet string) error
+	AddIpBlacklist(ctx context.Context, subnet string) error
+	DeleteIpBlacklist(ctx context.Context, subnet string) error
+}
 
 func NewServer(cfg config.Config, logger Logger, app Application) *Server {
 	return &Server{
