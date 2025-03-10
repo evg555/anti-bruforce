@@ -25,10 +25,18 @@ func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Respons
 	}
 
 	if h.app.IsInWhitelist(ctx, ipAddress) {
+		h.logger.Info(fmt.Sprintf("ip address %s in whitelist", ipAddress))
 		return &pb.Response{Ok: true}, nil
 	}
 
-	if h.app.IsInBlacklist(ctx, ipAddress) || !h.app.HasLimits(ctx, request.Login, request.Password, request.Ip) {
+	if h.app.IsInBlacklist(ctx, ipAddress) {
+		h.logger.Info(fmt.Sprintf("ip address %s in blacklist", ipAddress))
+		return &pb.Response{Ok: false}, nil
+	}
+
+	if !h.app.HasLimits(request.Login, request.Password, request.Ip) {
+		h.logger.Info(fmt.Sprintf("limits are ended for login %s or password %s or ip %s",
+			request.Login, request.Password, request.Ip))
 		return &pb.Response{Ok: false}, nil
 	}
 

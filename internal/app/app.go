@@ -4,12 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/evg555/antibrutforce/internal/rate_limiter"
 	"github.com/evg555/antibrutforce/internal/storage"
 )
 
 type App struct {
-	logger  Logger
-	storage Storage
+	logger      Logger
+	storage     Storage
+	rateLimiter *rate_limiter.AuthRateLimiter
 }
 
 //go:generate mockery --name=Logger
@@ -28,10 +30,11 @@ type Storage interface {
 	IsInList(ctx context.Context, address, listType string) (bool, error)
 }
 
-func New(logger Logger, storage Storage) *App {
+func New(logger Logger, storage Storage, rateLimiter *rate_limiter.AuthRateLimiter) *App {
 	return &App{
-		logger:  logger,
-		storage: storage,
+		logger:      logger,
+		storage:     storage,
+		rateLimiter: rateLimiter,
 	}
 }
 
@@ -55,8 +58,8 @@ func (a *App) IsInWhitelist(ctx context.Context, ip string) bool {
 	return isInList
 }
 
-func (a *App) HasLimits(ctx context.Context, login, password, ip string) bool {
-	return false
+func (a *App) HasLimits(login, password, ip string) bool {
+	return a.rateLimiter.AllowAttempt(login, password, ip)
 }
 
 func (a *App) AddIpWhitelist(ctx context.Context, subnet string) error {

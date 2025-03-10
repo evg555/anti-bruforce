@@ -33,7 +33,7 @@ type Application interface {
 
 	IsInBlacklist(ctx context.Context, ip string) bool
 	IsInWhitelist(ctx context.Context, ip string) bool
-	HasLimits(ctx context.Context, login, password, ip string) bool
+	HasLimits(login, password, ip string) bool
 }
 
 func NewServer(cfg config.Config, logger Logger, app Application) *Server {

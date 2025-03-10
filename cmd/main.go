@@ -3,20 +3,25 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/evg555/antibrutforce/internal/app"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/evg555/antibrutforce/internal/app"
 	"github.com/evg555/antibrutforce/internal/config"
 	"github.com/evg555/antibrutforce/internal/logger"
+	"github.com/evg555/antibrutforce/internal/rate_limiter"
 	internalgrpc "github.com/evg555/antibrutforce/internal/server/grpc"
 	sqlstorage "github.com/evg555/antibrutforce/internal/storage/sql"
 )
 
 func main() {
 	flag.Parse()
+
+	ctx, cancel := signal.NotifyContext(context.Background(),
+		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	defer cancel()
 
 	cfg := config.NewConfig()
 	logg := logger.New(cfg.Logger.Level, cfg.Logger.Format)
@@ -29,12 +34,9 @@ func main() {
 		cfg.Database.DBName,
 	)
 
-	service := app.New(&logg, storage)
+	rateLimiter := rate_limiter.NewAuthRateLimiter(ctx, cfg.RateLimiter)
+	service := app.New(&logg, storage, rateLimiter)
 	server := internalgrpc.NewServer(cfg, &logg, service)
-
-	ctx, cancel := signal.NotifyContext(context.Background(),
-		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-	defer cancel()
 
 	go func() {
 		<-ctx.Done()

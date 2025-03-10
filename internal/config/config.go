@@ -14,9 +14,10 @@ func init() {
 }
 
 type Config struct {
-	Logger   LoggerConf `mapstructure:"logger"`
-	App      AppConf    `mapstructure:"app"`
-	Database DBConf     `mapstructure:"database"`
+	Logger      LoggerConf  `mapstructure:"logger"`
+	App         AppConf     `mapstructure:"app"`
+	Database    DBConf      `mapstructure:"database"`
+	RateLimiter RateLimiter `mapstructure:"rate_limiter"`
 }
 
 type LoggerConf struct {
@@ -35,6 +36,13 @@ type DBConf struct {
 	DBName string `mapstructure:"dbname"`
 	User   string `mapstructure:"user"`
 	Pass   string `mapstructure:"pass"`
+}
+
+type RateLimiter struct {
+	LoginLimit         int `mapstructure:"login_limit"`
+	PasswordLimit      int `mapstructure:"password_limit"`
+	IpLimit            int `mapstructure:"ip_limit"`
+	ExpirationInterval int `mapstructure:"expiration_interval"`
 }
 
 func NewConfig() Config {

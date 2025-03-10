@@ -14,3 +14,9 @@ port = "5432"
 dbname = "dbname"
 user = "dbuser"
 pass = "dbpass"
+
+[rate_limiter]
+login_limit = 10
+password_limit = 100
+ip_limit = 1000
+expiration_interval = 300

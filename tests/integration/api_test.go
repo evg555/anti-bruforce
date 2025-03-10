@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/brianvoe/gofakeit"
 	"github.com/evg555/antibrutforce/api/pb"
 	"github.com/evg555/antibrutforce/internal/storage"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -131,12 +132,24 @@ func (a *APITestSuite) TestAuth() {
 	res, err = a.client.DeleteIpWhitelist(context.Background(), req)
 	a.NoError(err)
 
-	// Limits for password are ended
-	authReq = &pb.AuthRequest{
-		Login:    login,
-		Password: password,
-		Ip:       ipAddress,
+	// Brutforce on login
+	attempts := 10
+
+	for attempts > 0 {
+		authReq = &pb.AuthRequest{
+			Login:    login,
+			Password: gofakeit.Password(true, true, true, true, true, 10),
+			Ip:       gofakeit.IPv4Address(),
+		}
+
+		res, err = a.client.Auth(context.Background(), authReq)
+		a.NoError(err)
+		a.NotNil(res)
+		a.Require().True(res.Ok, "Attempts: %d", 10-attempts)
+
+		attempts--
 	}
+
 	res, err = a.client.Auth(context.Background(), authReq)
 	a.NoError(err)
 	a.NotNil(res)
