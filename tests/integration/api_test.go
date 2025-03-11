@@ -157,21 +157,39 @@ func (a *APITestSuite) TestAuth() {
 }
 
 func (a *APITestSuite) TestBucketReset() {
+	attempts := 100
+	ipAddress := "172.1.1.1"
+	password := "pass"
+
+	var authReq *pb.AuthRequest
+	for attempts > 0 {
+		authReq = &pb.AuthRequest{
+			Login:    gofakeit.Username(),
+			Password: password,
+			Ip:       ipAddress,
+		}
+
+		res, err := a.client.Auth(context.Background(), authReq)
+		a.NoError(err)
+		a.NotNil(res)
+		a.Require().True(res.Ok, "Attempts: %d", 100-attempts)
+
+		attempts--
+	}
+
 	req := &pb.BucketResetRequest{
-		Password: "pass",
-		Ip:       "172.1.1.1",
+		Password: password,
+		Ip:       ipAddress,
 	}
 	res, err := a.client.BucketReset(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
 
-	// Проверяем, что данные сохранились в БД
-	//var user User
-	//err = db.First(&user, res.Id).Error
-	//assert.NoError(t, err)
-	//assert.Equal(t, "John Doe", user.Name)
-	//assert.Equal(t, 30, user.Age)
+	res, err = a.client.Auth(context.Background(), authReq)
+	a.NoError(err)
+	a.NotNil(res)
+	a.True(res.Ok)
 }
 
 func (a *APITestSuite) TestIpWhitelist() {

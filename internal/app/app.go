@@ -77,3 +77,7 @@ func (a *App) AddIpBlacklist(ctx context.Context, subnet string) error {
 func (a *App) DeleteIpBlacklist(ctx context.Context, subnet string) error {
 	return a.storage.Delete(ctx, subnet, storage.Blacklist)
 }
+
+func (a *App) ResetBucket(password, ip string) {
+	a.rateLimiter.ResetBucket(password, ip)
+}

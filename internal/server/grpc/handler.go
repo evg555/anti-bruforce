@@ -43,7 +43,16 @@ func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Respons
 	return &pb.Response{Ok: true}, nil
 }
 
-func (h Handler) BucketReset(ctx context.Context, request *pb.BucketResetRequest) (*pb.Response, error) {
+func (h Handler) BucketReset(_ context.Context, request *pb.BucketResetRequest) (*pb.Response, error) {
+	ipAddress := request.Ip
+
+	if !common.IsValidIpAddress(ipAddress) {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid ip address")
+	}
+
+	h.app.ResetBucket(request.Password, ipAddress)
+	h.logger.Info(fmt.Sprintf("reset bucket for password %s and ip %s", request.Password, ipAddress))
+
 	return &pb.Response{Ok: true}, nil
 }
 

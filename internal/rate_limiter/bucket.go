@@ -42,3 +42,11 @@ func (b *Bucket) Allow() bool {
 
 	return false
 }
+
+func (b *Bucket) Reset() {
+	b.mutex.Lock()
+	defer b.mutex.Unlock()
+
+	b.tokens = b.capacity
+	b.lastCheck = time.Now()
+}

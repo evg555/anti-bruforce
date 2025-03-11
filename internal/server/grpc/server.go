@@ -34,6 +34,8 @@ type Application interface {
 	IsInBlacklist(ctx context.Context, ip string) bool
 	IsInWhitelist(ctx context.Context, ip string) bool
 	HasLimits(login, password, ip string) bool
+
+	ResetBucket(password, ip string)
 }
 
 func NewServer(cfg config.Config, logger Logger, app Application) *Server {

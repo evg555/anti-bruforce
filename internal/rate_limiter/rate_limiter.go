@@ -72,6 +72,14 @@ func (r *AuthRateLimiter) getBucket(key string, limit int, bucketMap map[string]
 	return bucket
 }
 
+func (r *AuthRateLimiter) ResetBucket(password, ip string) {
+	passwordBucket := r.getBucket(password, passwordLimit, r.passwords)
+	ipBucket := r.getBucket(ip, ipLimit, r.ips)
+
+	passwordBucket.Reset()
+	ipBucket.Reset()
+}
+
 func (r *AuthRateLimiter) cleanupBuckets(ctx context.Context) {
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()

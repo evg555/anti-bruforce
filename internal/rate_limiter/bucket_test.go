@@ -45,3 +45,28 @@ func TestAllow(t *testing.T) {
 		}
 	})
 }
+
+func TestReset(t *testing.T) {
+	limit := 10
+	rate := 100 * time.Millisecond
+
+	bucket := NewBucket(limit, rate)
+
+	t.Run("first 10 requests", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			if !bucket.Allow() {
+				t.Errorf("request %d must be allowed", i+1)
+			}
+		}
+	})
+
+	bucket.Reset()
+
+	t.Run("next 10 requests", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			if !bucket.Allow() {
+				t.Errorf("request %d must be allowed after reset", i+1)
+			}
+		}
+	})
+}
