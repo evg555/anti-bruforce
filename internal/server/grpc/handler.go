@@ -20,7 +20,7 @@ type Handler struct {
 func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Response, error) {
 	ipAddress := request.Ip
 
-	if !common.IsValidIpAddress(ipAddress) {
+	if !common.IsValidIPAddress(ipAddress) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid ip address")
 	}
 
@@ -46,7 +46,7 @@ func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Respons
 func (h Handler) BucketReset(_ context.Context, request *pb.BucketResetRequest) (*pb.Response, error) {
 	ipAddress := request.Ip
 
-	if !common.IsValidIpAddress(ipAddress) {
+	if !common.IsValidIPAddress(ipAddress) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid ip address")
 	}
 
@@ -56,14 +56,14 @@ func (h Handler) BucketReset(_ context.Context, request *pb.BucketResetRequest) 
 	return &pb.Response{Ok: true}, nil
 }
 
-func (h Handler) AddIpWhitelist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
+func (h Handler) AddIPWhitelist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
 	if !common.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
-	err := h.app.AddIpWhitelist(ctx, subnet)
+	err := h.app.AddIPWhitelist(ctx, subnet)
 	if err != nil {
 		h.logger.Error(fmt.Sprintf("add ip whitelist failed: %v", err))
 		return nil, status.Errorf(codes.Internal, "internal server error")
@@ -72,14 +72,14 @@ func (h Handler) AddIpWhitelist(ctx context.Context, request *pb.IpRequest) (*pb
 	return &pb.Response{Ok: true}, nil
 }
 
-func (h Handler) DeleteIpWhitelist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
+func (h Handler) DeleteIPWhitelist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
 	if !common.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
-	err := h.app.DeleteIpWhitelist(ctx, subnet)
+	err := h.app.DeleteIPWhitelist(ctx, subnet)
 	if err != nil {
 		h.logger.Error(fmt.Sprintf("delete ip whitelist failed: %v", err))
 		return nil, status.Errorf(codes.Internal, "internal server error")
@@ -88,14 +88,14 @@ func (h Handler) DeleteIpWhitelist(ctx context.Context, request *pb.IpRequest) (
 	return &pb.Response{Ok: true}, nil
 }
 
-func (h Handler) AddIpBlacklist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
+func (h Handler) AddIPBlacklist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
 	if !common.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
-	err := h.app.AddIpBlacklist(ctx, subnet)
+	err := h.app.AddIPBlacklist(ctx, subnet)
 	if err != nil {
 		h.logger.Error(fmt.Sprintf("add ip blacklist failed: %v", err))
 		return nil, status.Errorf(codes.Internal, "internal server error")
@@ -104,14 +104,14 @@ func (h Handler) AddIpBlacklist(ctx context.Context, request *pb.IpRequest) (*pb
 	return &pb.Response{Ok: true}, nil
 }
 
-func (h Handler) DeleteIpBlacklist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
+func (h Handler) DeleteIPBlacklist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
 	if !common.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
-	err := h.app.DeleteIpBlacklist(ctx, subnet)
+	err := h.app.DeleteIPBlacklist(ctx, subnet)
 	if err != nil {
 		h.logger.Error(fmt.Sprintf("delete ip blacklist failed: %v", err))
 		return nil, status.Errorf(codes.Internal, "internal server error")

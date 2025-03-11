@@ -21,10 +21,10 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AppService_Auth_FullMethodName              = "/app.AppService/Auth"
 	AppService_BucketReset_FullMethodName       = "/app.AppService/BucketReset"
-	AppService_AddIpWhitelist_FullMethodName    = "/app.AppService/AddIpWhitelist"
-	AppService_DeleteIpWhitelist_FullMethodName = "/app.AppService/DeleteIpWhitelist"
-	AppService_AddIpBlacklist_FullMethodName    = "/app.AppService/AddIpBlacklist"
-	AppService_DeleteIpBlacklist_FullMethodName = "/app.AppService/DeleteIpBlacklist"
+	AppService_AddIPWhitelist_FullMethodName    = "/app.AppService/AddIPWhitelist"
+	AppService_DeleteIPWhitelist_FullMethodName = "/app.AppService/DeleteIPWhitelist"
+	AppService_AddIPBlacklist_FullMethodName    = "/app.AppService/AddIPBlacklist"
+	AppService_DeleteIPBlacklist_FullMethodName = "/app.AppService/DeleteIPBlacklist"
 )
 
 // AppServiceClient is the client API for AppService service.
@@ -33,10 +33,10 @@ const (
 type AppServiceClient interface {
 	Auth(ctx context.Context, in *AuthRequest, opts ...grpc.CallOption) (*Response, error)
 	BucketReset(ctx context.Context, in *BucketResetRequest, opts ...grpc.CallOption) (*Response, error)
-	AddIpWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
-	DeleteIpWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
-	AddIpBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
-	DeleteIpBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
+	AddIPWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
+	DeleteIPWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
+	AddIPBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
+	DeleteIPBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error)
 }
 
 type appServiceClient struct {
@@ -67,40 +67,40 @@ func (c *appServiceClient) BucketReset(ctx context.Context, in *BucketResetReque
 	return out, nil
 }
 
-func (c *appServiceClient) AddIpWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
+func (c *appServiceClient) AddIPWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
-	err := c.cc.Invoke(ctx, AppService_AddIpWhitelist_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AppService_AddIPWhitelist_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) DeleteIpWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
+func (c *appServiceClient) DeleteIPWhitelist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
-	err := c.cc.Invoke(ctx, AppService_DeleteIpWhitelist_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AppService_DeleteIPWhitelist_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) AddIpBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
+func (c *appServiceClient) AddIPBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
-	err := c.cc.Invoke(ctx, AppService_AddIpBlacklist_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AppService_AddIPBlacklist_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *appServiceClient) DeleteIpBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
+func (c *appServiceClient) DeleteIPBlacklist(ctx context.Context, in *IpRequest, opts ...grpc.CallOption) (*Response, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(Response)
-	err := c.cc.Invoke(ctx, AppService_DeleteIpBlacklist_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, AppService_DeleteIPBlacklist_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -113,10 +113,10 @@ func (c *appServiceClient) DeleteIpBlacklist(ctx context.Context, in *IpRequest,
 type AppServiceServer interface {
 	Auth(context.Context, *AuthRequest) (*Response, error)
 	BucketReset(context.Context, *BucketResetRequest) (*Response, error)
-	AddIpWhitelist(context.Context, *IpRequest) (*Response, error)
-	DeleteIpWhitelist(context.Context, *IpRequest) (*Response, error)
-	AddIpBlacklist(context.Context, *IpRequest) (*Response, error)
-	DeleteIpBlacklist(context.Context, *IpRequest) (*Response, error)
+	AddIPWhitelist(context.Context, *IpRequest) (*Response, error)
+	DeleteIPWhitelist(context.Context, *IpRequest) (*Response, error)
+	AddIPBlacklist(context.Context, *IpRequest) (*Response, error)
+	DeleteIPBlacklist(context.Context, *IpRequest) (*Response, error)
 	mustEmbedUnimplementedAppServiceServer()
 }
 
@@ -133,17 +133,17 @@ func (UnimplementedAppServiceServer) Auth(context.Context, *AuthRequest) (*Respo
 func (UnimplementedAppServiceServer) BucketReset(context.Context, *BucketResetRequest) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BucketReset not implemented")
 }
-func (UnimplementedAppServiceServer) AddIpWhitelist(context.Context, *IpRequest) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddIpWhitelist not implemented")
+func (UnimplementedAppServiceServer) AddIPWhitelist(context.Context, *IpRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddIPWhitelist not implemented")
 }
-func (UnimplementedAppServiceServer) DeleteIpWhitelist(context.Context, *IpRequest) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteIpWhitelist not implemented")
+func (UnimplementedAppServiceServer) DeleteIPWhitelist(context.Context, *IpRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteIPWhitelist not implemented")
 }
-func (UnimplementedAppServiceServer) AddIpBlacklist(context.Context, *IpRequest) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddIpBlacklist not implemented")
+func (UnimplementedAppServiceServer) AddIPBlacklist(context.Context, *IpRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddIPBlacklist not implemented")
 }
-func (UnimplementedAppServiceServer) DeleteIpBlacklist(context.Context, *IpRequest) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteIpBlacklist not implemented")
+func (UnimplementedAppServiceServer) DeleteIPBlacklist(context.Context, *IpRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteIPBlacklist not implemented")
 }
 func (UnimplementedAppServiceServer) mustEmbedUnimplementedAppServiceServer() {}
 func (UnimplementedAppServiceServer) testEmbeddedByValue()                    {}
@@ -202,74 +202,74 @@ func _AppService_BucketReset_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_AddIpWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_AddIPWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).AddIpWhitelist(ctx, in)
+		return srv.(AppServiceServer).AddIPWhitelist(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AppService_AddIpWhitelist_FullMethodName,
+		FullMethod: AppService_AddIPWhitelist_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).AddIpWhitelist(ctx, req.(*IpRequest))
+		return srv.(AppServiceServer).AddIPWhitelist(ctx, req.(*IpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_DeleteIpWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_DeleteIPWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).DeleteIpWhitelist(ctx, in)
+		return srv.(AppServiceServer).DeleteIPWhitelist(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AppService_DeleteIpWhitelist_FullMethodName,
+		FullMethod: AppService_DeleteIPWhitelist_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).DeleteIpWhitelist(ctx, req.(*IpRequest))
+		return srv.(AppServiceServer).DeleteIPWhitelist(ctx, req.(*IpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_AddIpBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_AddIPBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).AddIpBlacklist(ctx, in)
+		return srv.(AppServiceServer).AddIPBlacklist(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AppService_AddIpBlacklist_FullMethodName,
+		FullMethod: AppService_AddIPBlacklist_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).AddIpBlacklist(ctx, req.(*IpRequest))
+		return srv.(AppServiceServer).AddIPBlacklist(ctx, req.(*IpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AppService_DeleteIpBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AppService_DeleteIPBlacklist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(IpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AppServiceServer).DeleteIpBlacklist(ctx, in)
+		return srv.(AppServiceServer).DeleteIPBlacklist(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AppService_DeleteIpBlacklist_FullMethodName,
+		FullMethod: AppService_DeleteIPBlacklist_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AppServiceServer).DeleteIpBlacklist(ctx, req.(*IpRequest))
+		return srv.(AppServiceServer).DeleteIPBlacklist(ctx, req.(*IpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -290,20 +290,20 @@ var AppService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AppService_BucketReset_Handler,
 		},
 		{
-			MethodName: "AddIpWhitelist",
-			Handler:    _AppService_AddIpWhitelist_Handler,
+			MethodName: "AddIPWhitelist",
+			Handler:    _AppService_AddIPWhitelist_Handler,
 		},
 		{
-			MethodName: "DeleteIpWhitelist",
-			Handler:    _AppService_DeleteIpWhitelist_Handler,
+			MethodName: "DeleteIPWhitelist",
+			Handler:    _AppService_DeleteIPWhitelist_Handler,
 		},
 		{
-			MethodName: "AddIpBlacklist",
-			Handler:    _AppService_AddIpBlacklist_Handler,
+			MethodName: "AddIPBlacklist",
+			Handler:    _AppService_AddIPBlacklist_Handler,
 		},
 		{
-			MethodName: "DeleteIpBlacklist",
-			Handler:    _AppService_DeleteIpBlacklist_Handler,
+			MethodName: "DeleteIPBlacklist",
+			Handler:    _AppService_DeleteIPBlacklist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

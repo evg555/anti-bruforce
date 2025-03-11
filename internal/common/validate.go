@@ -7,7 +7,7 @@ func IsValidSubnet(subnet string) bool {
 	return err == nil
 }
 
-func IsValidIpAddress(ip string) bool {
+func IsValidIPAddress(ip string) bool {
 	valid := net.ParseIP(ip)
 	return valid != nil
 }

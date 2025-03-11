@@ -17,7 +17,7 @@ build:
 test:
 	go test -v -count=1 ./internal/...
 
-test_integrate: up
+test_integrate: run
 	go test -v -count=1 ./tests/...
 
 install-lint-deps:
@@ -26,7 +26,7 @@ install-lint-deps:
 lint: install-lint-deps
 	golangci-lint run ./...
 
-up:
+run:
 	docker compose -f deployments/docker-compose.yaml up -d
 
 down:
@@ -46,4 +46,4 @@ migrate-down:
 	$(GOOSE) -dir $(MIGRATIONS_DIR) postgres "postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_DATABASE)?sslmode=disable" down
 
 
-.PHONY: build test lint up down generate test_integrate migrate-up migrate-down
+.PHONY: build test lint run down generate test_integrate migrate-up migrate-down

@@ -1,4 +1,4 @@
-package rate_limiter
+package ratelimiter
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func TestAAllowAttempt(t *testing.T) {
 	rateLimiter := NewAuthRateLimiter(ctx, config.RateLimiter{
 		LoginLimit:         limit,
 		PasswordLimit:      limit * 10,
-		IpLimit:            limit * 100,
+		IPLimit:            limit * 100,
 		ExpirationInterval: expiration,
 	})
 

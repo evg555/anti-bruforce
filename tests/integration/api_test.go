@@ -2,7 +2,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/brianvoe/gofakeit"
@@ -15,6 +14,13 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
+)
+
+const (
+	netAddress = "172.1.1.0/24"
+	ipAddress  = "172.1.1.1"
+	login      = "login"
+	password   = "password"
 )
 
 type APITestSuite struct {
@@ -40,7 +46,7 @@ func (a *APITestSuite) SetupTest() {
 func (a *APITestSuite) setupDB() {
 	var err error
 
-	dsn := fmt.Sprintf("postgresql://dbuser:dbpass@localhost:5432/dbname?sslmode=disable")
+	dsn := "postgresql://dbuser:dbpass@localhost:5432/dbname?sslmode=disable"
 
 	db, err := sqlx.Open("pgx", dsn)
 	a.Require().NoError(err)
@@ -73,13 +79,8 @@ func (a *APITestSuite) TearDownSuite() {
 }
 
 func (a *APITestSuite) TestAuth() {
-	netAddress := "172.1.1.0/24"
-	ipAddress := "172.1.1.1"
-	login := "login"
-	password := "password"
-
 	authReq := &pb.AuthRequest{}
-	res, err := a.client.Auth(context.Background(), authReq)
+	_, err := a.client.Auth(context.Background(), authReq)
 	a.Error(err)
 
 	st, ok := status.FromError(err)
@@ -88,7 +89,7 @@ func (a *APITestSuite) TestAuth() {
 
 	// In blacklist
 	req := &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.AddIpBlacklist(context.Background(), req)
+	_, err = a.client.AddIPBlacklist(context.Background(), req)
 	a.NoError(err)
 
 	authReq = &pb.AuthRequest{
@@ -96,22 +97,22 @@ func (a *APITestSuite) TestAuth() {
 		Password: password,
 		Ip:       ipAddress,
 	}
-	res, err = a.client.Auth(context.Background(), authReq)
+	res, err := a.client.Auth(context.Background(), authReq)
 	a.NoError(err)
 	a.NotNil(res)
 	a.False(res.Ok)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.DeleteIpBlacklist(context.Background(), req)
+	_, err = a.client.DeleteIPBlacklist(context.Background(), req)
 	a.NoError(err)
 
 	// In whitelist (priority)
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.AddIpBlacklist(context.Background(), req)
+	_, err = a.client.AddIPBlacklist(context.Background(), req)
 	a.NoError(err)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.AddIpWhitelist(context.Background(), req)
+	_, err = a.client.AddIPWhitelist(context.Background(), req)
 	a.NoError(err)
 
 	authReq = &pb.AuthRequest{
@@ -125,11 +126,11 @@ func (a *APITestSuite) TestAuth() {
 	a.True(res.Ok)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.DeleteIpBlacklist(context.Background(), req)
+	_, err = a.client.DeleteIPBlacklist(context.Background(), req)
 	a.NoError(err)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.DeleteIpWhitelist(context.Background(), req)
+	_, err = a.client.DeleteIPWhitelist(context.Background(), req)
 	a.NoError(err)
 
 	// Brutforce on login
@@ -158,8 +159,6 @@ func (a *APITestSuite) TestAuth() {
 
 func (a *APITestSuite) TestBucketReset() {
 	attempts := 100
-	ipAddress := "172.1.1.1"
-	password := "pass"
 
 	var authReq *pb.AuthRequest
 	for attempts > 0 {
@@ -192,12 +191,10 @@ func (a *APITestSuite) TestBucketReset() {
 	a.True(res.Ok)
 }
 
-func (a *APITestSuite) TestIpWhitelist() {
-	netAddress := "172.1.1.0/24"
-
+func (a *APITestSuite) TestIPWhitelist() { //nolint:dupl
 	// Invalid subnet
 	req := &pb.IpRequest{}
-	res, err := a.client.AddIpWhitelist(context.Background(), req)
+	_, err := a.client.AddIPWhitelist(context.Background(), req)
 	a.Error(err)
 
 	st, ok := status.FromError(err)
@@ -206,7 +203,7 @@ func (a *APITestSuite) TestIpWhitelist() {
 
 	// Positive case
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.AddIpWhitelist(context.Background(), req)
+	res, err := a.client.AddIPWhitelist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
@@ -217,7 +214,7 @@ func (a *APITestSuite) TestIpWhitelist() {
 	a.Equal(rows1[0].Address, netAddress)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.DeleteIpWhitelist(context.Background(), req)
+	res, err = a.client.DeleteIPWhitelist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
@@ -228,12 +225,10 @@ func (a *APITestSuite) TestIpWhitelist() {
 	a.Empty(rows2)
 }
 
-func (a *APITestSuite) TestIpBlackList() {
-	netAddress := "172.1.1.0/24"
-
+func (a *APITestSuite) TestIPBlackList() { //nolint:dupl
 	// Invalid subnet
 	req := &pb.IpRequest{}
-	res, err := a.client.AddIpBlacklist(context.Background(), req)
+	_, err := a.client.AddIPBlacklist(context.Background(), req)
 	a.Error(err)
 
 	st, ok := status.FromError(err)
@@ -242,7 +237,7 @@ func (a *APITestSuite) TestIpBlackList() {
 
 	// Positive case
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.AddIpBlacklist(context.Background(), req)
+	res, err := a.client.AddIPBlacklist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)
@@ -253,7 +248,7 @@ func (a *APITestSuite) TestIpBlackList() {
 	a.Equal(rows1[0].Address, netAddress)
 
 	req = &pb.IpRequest{NetAddress: netAddress}
-	res, err = a.client.DeleteIpBlacklist(context.Background(), req)
+	res, err = a.client.DeleteIPBlacklist(context.Background(), req)
 	a.NoError(err)
 	a.NotNil(res)
 	a.True(res.Ok)

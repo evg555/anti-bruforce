@@ -1,4 +1,4 @@
-package rate_limiter
+package ratelimiter
 
 import (
 	"context"
@@ -37,8 +37,8 @@ func NewAuthRateLimiter(ctx context.Context, cfg config.RateLimiter) *AuthRateLi
 		passwordLimit = cfg.PasswordLimit
 	}
 
-	if cfg.IpLimit > 0 {
-		ipLimit = cfg.IpLimit
+	if cfg.IPLimit > 0 {
+		ipLimit = cfg.IPLimit
 	}
 
 	if cfg.ExpirationInterval > 0 {

@@ -16,16 +16,20 @@ services:
       antibrutforce:
         aliases:
           - app
-#  migrate:
-#    build:
-#      context: ..
-#      dockerfile: build/Dockerfile_migrate
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#    command: >
-#      goose -dir /migrations postgres "postgres://dbuser:dbpass@db:5432/hw?sslmode=disable" up
-#    restart: "no"
+  migrate:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      goose -dir /migrations postgres "postgres://dbuser:dbpass@db:5432/dbname?sslmode=disable" up
+    restart: "no"
+    networks:
+      antibrutforce:
+        aliases:
+          - migrate
 
   db:
     image: postgres:16.8-alpine3.21

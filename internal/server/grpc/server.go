@@ -3,12 +3,12 @@ package internalgrpc
 import (
 	"context"
 	"fmt"
-	"github.com/evg555/antibrutforce/api/pb"
-	"google.golang.org/grpc/reflection"
 	"net"
 
+	"github.com/evg555/antibrutforce/api/pb"
 	"github.com/evg555/antibrutforce/internal/config"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 type Server struct {
@@ -26,10 +26,10 @@ type Logger interface {
 }
 
 type Application interface {
-	AddIpWhitelist(ctx context.Context, subnet string) error
-	DeleteIpWhitelist(ctx context.Context, subnet string) error
-	AddIpBlacklist(ctx context.Context, subnet string) error
-	DeleteIpBlacklist(ctx context.Context, subnet string) error
+	AddIPWhitelist(ctx context.Context, subnet string) error
+	DeleteIPWhitelist(ctx context.Context, subnet string) error
+	AddIPBlacklist(ctx context.Context, subnet string) error
+	DeleteIPBlacklist(ctx context.Context, subnet string) error
 
 	IsInBlacklist(ctx context.Context, ip string) bool
 	IsInWhitelist(ctx context.Context, ip string) bool

@@ -4,17 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/evg555/antibrutforce/internal/rate_limiter"
+	"github.com/evg555/antibrutforce/internal/ratelimiter"
 	"github.com/evg555/antibrutforce/internal/storage"
 )
 
 type App struct {
 	logger      Logger
 	storage     Storage
-	rateLimiter *rate_limiter.AuthRateLimiter
+	rateLimiter *ratelimiter.AuthRateLimiter
 }
 
-//go:generate mockery --name=Logger
 type Logger interface {
 	Info(msg string)
 	Error(msg string)
@@ -22,7 +21,6 @@ type Logger interface {
 	Debug(msg string)
 }
 
-//go:generate mockery --name=Storage
 type Storage interface {
 	Save(ctx context.Context, subnet storage.Subnet, listType string) error
 	Find(ctx context.Context, address, listType string) (*storage.Subnet, error)
@@ -30,7 +28,7 @@ type Storage interface {
 	IsInList(ctx context.Context, address, listType string) (bool, error)
 }
 
-func New(logger Logger, storage Storage, rateLimiter *rate_limiter.AuthRateLimiter) *App {
+func New(logger Logger, storage Storage, rateLimiter *ratelimiter.AuthRateLimiter) *App {
 	return &App{
 		logger:      logger,
 		storage:     storage,
@@ -62,19 +60,19 @@ func (a *App) HasLimits(login, password, ip string) bool {
 	return a.rateLimiter.AllowAttempt(login, password, ip)
 }
 
-func (a *App) AddIpWhitelist(ctx context.Context, subnet string) error {
+func (a *App) AddIPWhitelist(ctx context.Context, subnet string) error {
 	return a.storage.Save(ctx, storage.Subnet{Address: subnet}, storage.Whitelist)
 }
 
-func (a *App) DeleteIpWhitelist(ctx context.Context, subnet string) error {
+func (a *App) DeleteIPWhitelist(ctx context.Context, subnet string) error {
 	return a.storage.Delete(ctx, subnet, storage.Whitelist)
 }
 
-func (a *App) AddIpBlacklist(ctx context.Context, subnet string) error {
+func (a *App) AddIPBlacklist(ctx context.Context, subnet string) error {
 	return a.storage.Save(ctx, storage.Subnet{Address: subnet}, storage.Blacklist)
 }
 
-func (a *App) DeleteIpBlacklist(ctx context.Context, subnet string) error {
+func (a *App) DeleteIPBlacklist(ctx context.Context, subnet string) error {
 	return a.storage.Delete(ctx, subnet, storage.Blacklist)
 }
 

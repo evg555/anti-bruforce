@@ -9,13 +9,13 @@ service AppService {
   }
   rpc BucketReset(BucketResetRequest) returns (Response) {
   }
-  rpc AddIpWhitelist(IpRequest) returns (Response) {
+  rpc AddIPWhitelist(IpRequest) returns (Response) {
   }
-  rpc DeleteIpWhitelist(IpRequest) returns (Response) {
+  rpc DeleteIPWhitelist(IpRequest) returns (Response) {
   }
-  rpc AddIpBlacklist(IpRequest) returns (Response) {
+  rpc AddIPBlacklist(IpRequest) returns (Response) {
   }
-  rpc DeleteIpBlacklist(IpRequest) returns (Response) {
+  rpc DeleteIPBlacklist(IpRequest) returns (Response) {
   }
 }
 

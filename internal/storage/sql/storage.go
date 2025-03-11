@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/evg555/antibrutforce/internal/storage"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib" // PostgreSQL driver is required for database/sql package
 	"github.com/jmoiron/sqlx"
 )
 

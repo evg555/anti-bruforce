@@ -41,7 +41,7 @@ type DBConf struct {
 type RateLimiter struct {
 	LoginLimit         int `mapstructure:"login_limit"`
 	PasswordLimit      int `mapstructure:"password_limit"`
-	IpLimit            int `mapstructure:"ip_limit"`
+	IPLimit            int `mapstructure:"ip_limit"`
 	ExpirationInterval int `mapstructure:"expiration_interval"`
 }
 

@@ -46,7 +46,7 @@ func TestIsValidIpAddress(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("test ip: "+tc.input, func(t *testing.T) {
-			assert.Equal(t, tc.expected, IsValidIpAddress(tc.input))
+			assert.Equal(t, tc.expected, IsValidIPAddress(tc.input))
 		})
 	}
 }

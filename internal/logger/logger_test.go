@@ -7,14 +7,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	levelInfo  = "info"
+	levelDebug = "debug"
+	levelError = "error"
+	levelWarn  = "warn"
+
+	formatText = "text"
+	formatJSON = "json"
+)
+
 func TestLogger(t *testing.T) {
 	t.Run("level debug", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		level := "debug"
-		format := "text"
-
-		logger := New(level, format)
+		logger := New(levelDebug, formatText)
 		require.NotNil(t, logger)
 
 		logger.logger.Out = &buf
@@ -27,10 +34,7 @@ func TestLogger(t *testing.T) {
 	t.Run("level info", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		level := "info"
-		format := "text"
-
-		logger := New(level, format)
+		logger := New(levelInfo, formatText)
 		require.NotNil(t, logger)
 
 		logger.logger.Out = &buf
@@ -45,10 +49,7 @@ func TestLogger(t *testing.T) {
 	t.Run("level warn", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		level := "warn"
-		format := "text"
-
-		logger := New(level, format)
+		logger := New(levelWarn, formatText)
 		require.NotNil(t, logger)
 		logger.logger.Out = &buf
 
@@ -64,10 +65,7 @@ func TestLogger(t *testing.T) {
 	t.Run("level error", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		level := "error"
-		format := "text"
-
-		logger := New(level, format)
+		logger := New(levelError, formatText)
 		require.NotNil(t, logger)
 		logger.logger.Out = &buf
 
@@ -84,19 +82,15 @@ func TestLogger(t *testing.T) {
 	t.Run("invalid level", func(t *testing.T) {
 		require.Panics(t, func() {
 			level := "invalid"
-			format := "text"
 
-			New(level, format)
+			New(level, formatText)
 		}, "expected panic for invalid log level, but none occurred")
 	})
 
 	t.Run("json format", func(t *testing.T) {
 		var buf bytes.Buffer
 
-		level := "info"
-		format := "json"
-
-		logger := New(level, format)
+		logger := New(levelInfo, formatJSON)
 		require.NotNil(t, logger)
 		logger.logger.Out = &buf
 
@@ -108,10 +102,9 @@ func TestLogger(t *testing.T) {
 
 	t.Run("invalid format", func(t *testing.T) {
 		require.Panics(t, func() {
-			level := "info"
 			format := "invalid"
 
-			New(level, format)
+			New(levelInfo, format)
 		}, "expected panic for invalid log format, but none occurred")
 	})
 }
