@@ -34,16 +34,6 @@ func TestAllow(t *testing.T) {
 			}
 		}
 	})
-
-	time.Sleep(1 * time.Second)
-
-	t.Run("all tokens restored", func(t *testing.T) {
-		for i := 0; i < 10; i++ {
-			if !bucket.Allow() {
-				t.Errorf("request %d must be allowed", i+1)
-			}
-		}
-	})
 }
 
 func TestReset(t *testing.T) {

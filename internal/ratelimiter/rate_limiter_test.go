@@ -8,7 +8,9 @@ import (
 )
 
 func TestAAllowAttempt(t *testing.T) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	login := "login"
 	password := "password"
 	ip := "127.0.0.1"
@@ -39,7 +41,9 @@ func TestAAllowAttempt(t *testing.T) {
 }
 
 func TestResetBucket(t *testing.T) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	login := "login"
 	password := "password"
 	ip := "127.0.0.1"
