@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/evg555/antibrutforce/api/pb"
-	"github.com/evg555/antibrutforce/internal/common"
+	"github.com/evg555/antibrutforce/internal/common/validate"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -18,10 +18,20 @@ type Handler struct {
 }
 
 func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Response, error) {
+	login := request.Login
+	password := request.Password
 	ipAddress := request.Ip
 
-	if !common.IsValidIPAddress(ipAddress) {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid ip address")
+	if validate.IsEmpty(login) {
+		return nil, status.Errorf(codes.InvalidArgument, "empty login")
+	}
+
+	if validate.IsEmpty(password) {
+		return nil, status.Errorf(codes.InvalidArgument, "empty password")
+	}
+
+	if !validate.IsValidIPAddress(ipAddress) {
+		return nil, status.Errorf(codes.InvalidArgument, "empty or invalid ip address")
 	}
 
 	if h.app.IsInWhitelist(ctx, ipAddress) {
@@ -34,9 +44,9 @@ func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Respons
 		return &pb.Response{Ok: false}, nil
 	}
 
-	if !h.app.HasLimits(request.Login, request.Password, request.Ip) {
+	if !h.app.HasLimits(login, password, ipAddress) {
 		h.logger.Info(fmt.Sprintf("limits are ended for login %s or password %s or ip %s",
-			request.Login, request.Password, request.Ip))
+			login, password, ipAddress))
 		return &pb.Response{Ok: false}, nil
 	}
 
@@ -44,10 +54,15 @@ func (h Handler) Auth(ctx context.Context, request *pb.AuthRequest) (*pb.Respons
 }
 
 func (h Handler) BucketReset(_ context.Context, request *pb.BucketResetRequest) (*pb.Response, error) {
+	password := request.Password
 	ipAddress := request.Ip
 
-	if !common.IsValidIPAddress(ipAddress) {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid ip address")
+	if validate.IsEmpty(password) {
+		return nil, status.Errorf(codes.InvalidArgument, "empty password")
+	}
+
+	if !validate.IsValidIPAddress(ipAddress) {
+		return nil, status.Errorf(codes.InvalidArgument, "empty or invalid ip address")
 	}
 
 	h.app.ResetBucket(request.Password, ipAddress)
@@ -59,7 +74,7 @@ func (h Handler) BucketReset(_ context.Context, request *pb.BucketResetRequest) 
 func (h Handler) AddIPWhitelist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
-	if !common.IsValidSubnet(subnet) {
+	if !validate.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
@@ -75,7 +90,7 @@ func (h Handler) AddIPWhitelist(ctx context.Context, request *pb.IpRequest) (*pb
 func (h Handler) DeleteIPWhitelist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
-	if !common.IsValidSubnet(subnet) {
+	if !validate.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
@@ -91,7 +106,7 @@ func (h Handler) DeleteIPWhitelist(ctx context.Context, request *pb.IpRequest) (
 func (h Handler) AddIPBlacklist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
-	if !common.IsValidSubnet(subnet) {
+	if !validate.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
@@ -107,7 +122,7 @@ func (h Handler) AddIPBlacklist(ctx context.Context, request *pb.IpRequest) (*pb
 func (h Handler) DeleteIPBlacklist(ctx context.Context, request *pb.IpRequest) (*pb.Response, error) {
 	subnet := request.NetAddress
 
-	if !common.IsValidSubnet(subnet) {
+	if !validate.IsValidSubnet(subnet) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid net address")
 	}
 
