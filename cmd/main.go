@@ -19,6 +19,8 @@ import (
 func main() {
 	flag.Parse()
 
+	exitCode := 0
+
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer cancel()
@@ -51,13 +53,18 @@ func main() {
 		if err := server.Stop(ctx); err != nil {
 			logg.Error("failed to stop server: " + err.Error())
 		}
+
+		os.Exit(exitCode)
 	}()
 
 	logg.Info("app is running...")
 
 	if err := server.Start(ctx); err != nil {
 		logg.Error("failed to start server: " + err.Error())
+
+		exitCode = 1
 		cancel()
-		os.Exit(1) //nolint:gocritic
 	}
+
+	select {}
 }
